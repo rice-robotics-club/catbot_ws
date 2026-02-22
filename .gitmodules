@@ -1,3 +1,6 @@
 [submodule "src/ros_odrive"]
 	path = src/ros_odrive
 	url = https://github.com/odriverobotics/ros_odrive.git
+[submodule "src/catbot_description"]
+	path = src/catbot_description
+	url = https://github.com/rice-robotics-club/catbot_description.git
