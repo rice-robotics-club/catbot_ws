@@ -1,0 +1,14 @@
+robot:
+  name: servobot
+  # Paths are relative to workspace root (CATBOT_WS)
+  urdf_path: robots/servobot_description/urdf/robot.urdf
+  rviz_config: src/rsl_runner/servobot-rl-genesis/robots/servobot_description/rviz/servobot.rviz
+  # RL training config — joint names and ordering are read from env.joints
+  training_config: src/rsl_runner/servobot-rl-genesis/config/servobot.yaml
+  # gonna need to fine-tune these frequencies depending on what the pi can handle. 
+  observation_frequency: 10.0 # Hz
+  control_frequency: 20.0  # Hz
+
+model:
+  # Path relative to workspace root (CATBOT_WS)
+  path: src/rsl_runner/servobot-rl-genesis/savedlogs/firstpancake/model_200.pt
