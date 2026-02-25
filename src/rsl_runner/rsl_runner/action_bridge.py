@@ -8,7 +8,8 @@ to a physical joint angle with the same formula used in simulation:
 
     target = clip(action * action_scale + default_dof_pos, lower, upper)
 
-Joint limits come from the URDF (±π/2 for hip/top, ±π/6 for bot joints).
+Joint names are sorted alphabetically to match genesis.py's sorted() ordering.
+Joint limits are derived from the joint name suffix (±π/6 for *_bot, ±π/2 otherwise).
 '''
 
 import math
@@ -19,17 +20,13 @@ from rclpy.node import Node
 from std_msgs.msg import Float32MultiArray
 from sensor_msgs.msg import JointState
 
-# URDF joint limits (radians) — hip/top: ±90°, bot: ±30°
-_HIP_LIM = math.pi / 2
-_TOP_LIM = math.pi / 2
-_BOT_LIM = math.pi / 6
-# Repeats for FL, FR, BL, BR
-_JOINT_LIMITS = [
-    _HIP_LIM, _TOP_LIM, _BOT_LIM,
-    _HIP_LIM, _TOP_LIM, _BOT_LIM,
-    _HIP_LIM, _TOP_LIM, _BOT_LIM,
-    _HIP_LIM, _TOP_LIM, _BOT_LIM,
-]
+# URDF joint limits derived from joint name suffix
+_BOT_LIM = math.pi / 6   # *_bot joints: ±30°
+_DEFAULT_LIM = math.pi / 2  # all others: ±90°
+
+
+def _limit_for(name: str) -> float:
+    return _BOT_LIM if name.endswith('_bot') else _DEFAULT_LIM
 
 
 def load_training_config():
@@ -41,8 +38,8 @@ def load_training_config():
     with open(training_config_path) as f:
         training_config = yaml.safe_load(f)
     joints = training_config['env']['joints']
-    names = list(joints.keys())
-    defaults = list(joints.values())
+    names = sorted(joints.keys())
+    defaults = [joints[n] for n in names]
     action_scale = training_config['env'].get('action_scale', 0.25)
     return names, defaults, action_scale
 
@@ -52,8 +49,7 @@ class ActionBridge(Node):
         super().__init__('action_bridge')
 
         self.joint_names, self.default_dof_pos, self.action_scale = load_training_config()
-        n = len(self.joint_names)
-        self.limits = _JOINT_LIMITS[:n]
+        self.limits = [_limit_for(n) for n in self.joint_names]
 
         self.sub = self.create_subscription(
             Float32MultiArray,
@@ -63,7 +59,7 @@ class ActionBridge(Node):
         )
         self.pub = self.create_publisher(JointState, 'joint_states', 10)
         self.get_logger().info(
-            f'Action bridge ready: {n} joints, action_scale={self.action_scale}'
+            f'Action bridge ready: {len(self.joint_names)} joints, action_scale={self.action_scale}'
         )
 
     def actions_callback(self, msg):

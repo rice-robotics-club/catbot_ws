@@ -17,9 +17,9 @@ Each leg column has TWO stacked panels:
   │        *        foot                         │
   └─────────────────────────────────────────────┘
 
-Joint indices (training config order):
-  FL: hip=0  top=1  bot=2      FR: hip=3  top=4  bot=5
-  BL: hip=6  top=7  bot=8      BR: hip=9  top=10 bot=11
+Joint indices (alphabetical config order):
+  BL: bot=0 hip=1 top=2      BR: bot=3 hip=4 top=5
+  FL: bot=6 hip=7 top=8      FR: bot=9 hip=10 top=11
 """
 
 import math
@@ -48,10 +48,10 @@ _ML, _MR = '├', '┤'
 _BH, _BV = '─', '│'
 
 # ── Joint layout ──────────────────────────────────────────────────────────────
-LEG_NAMES = ['FL', 'FR', 'BL', 'BR']
-HIP_IDX   = [0, 3, 6, 9]
-TOP_IDX   = [1, 4, 7, 10]
-BOT_IDX   = [2, 5, 8, 11]
+LEG_NAMES = ['BL', 'BR', 'FL', 'FR']
+HIP_IDX   = [1, 4, 7, 10]
+TOP_IDX   = [2, 5, 8, 11]
+BOT_IDX   = [0, 3, 6, 9]
 
 # ── Training config ───────────────────────────────────────────────────────────
 ACTION_SCALE = 0.25
@@ -60,16 +60,16 @@ ACTION_SCALE = 0.25
 DEFAULT_DOF_POS: list[float] = [0.0] * 12  # zero offset — target = action × ACTION_SCALE
 
 # URDF joint limits (radians) — used to clamp display angles to stay within canvas
-# Order mirrors joint index: hip, top, bot  (same limits for all 4 legs)
+# Order mirrors joint index alphabetical: bot, hip, top  (same limits for all 4 legs)
 _HIP_LIMIT = math.pi / 2        # ±90°  (URDF: ±1.5708)
 _TOP_LIMIT = math.pi / 2        # ±90°  (URDF: ±1.5708)
 _BOT_LIMIT = math.pi / 6        # ±30°  (URDF: ±0.5236)
-# Per-joint clamp bounds in training-config order
+# Per-joint clamp bounds in alphabetical config order
 _DISPLAY_LIMITS = [
-    _HIP_LIMIT, _TOP_LIMIT, _BOT_LIMIT,   # FL
-    _HIP_LIMIT, _TOP_LIMIT, _BOT_LIMIT,   # FR
-    _HIP_LIMIT, _TOP_LIMIT, _BOT_LIMIT,   # BL
-    _HIP_LIMIT, _TOP_LIMIT, _BOT_LIMIT,   # BR
+    _BOT_LIMIT, _HIP_LIMIT, _TOP_LIMIT,   # BL
+    _BOT_LIMIT, _HIP_LIMIT, _TOP_LIMIT,   # BR
+    _BOT_LIMIT, _HIP_LIMIT, _TOP_LIMIT,   # FL
+    _BOT_LIMIT, _HIP_LIMIT, _TOP_LIMIT,   # FR
 ]
 
 
