@@ -1,0 +1,11 @@
+<library path="catbot_control">
+  <class
+    name="catbot_control/JointStateBroadcaster"
+    type=catbot_control::JointStateBroadcaster"
+    base_class_type="controller_interface::ControllerInterface"
+  >
+    <description>
+      The catbot joint state broadcaster publishes all necessary joint interfaces for actuated and non-actuated joints.
+    </description>
+  </class>
+</library>

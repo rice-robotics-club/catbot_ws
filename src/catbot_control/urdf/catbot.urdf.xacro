@@ -2,104 +2,102 @@
 <!-- Basic differential drive mobile base -->
 <robot xmlns:xacro="http://www.ros.org/wiki/xacro" name="catbot">
   <xacro:include filename="$(find catbot_description)/robot.urdf" />
-  <ros2_control name="FrontLeft" type="system">
+  <ros2_control name="ODrives" type="system">
     <xacro:unless value="${use_mock_hardware}">
       <hardware>
         <plugin>odrive_ros2_control_plugin/ODriveHardwareInterface</plugin>
-        <group>1</group>
         <param name="can">can0</param>
       </hardware>
     </xacro:unless>
     <xacro:if value="${use_mock_hardware}">
       <hardware>
         <plugin>mock_components/GenericSystem</plugin>
-        <group>1</group>
         <param name="calculate_dynamics">true</param>
       </hardware>
     </xacro:if>
     <joint name="FL_hip">
       <param name="node_id">0</param>
+      <command_interface name="position" />
+      <state_interface name="position" />
+      <state_interface name="velocity" />
+      <state_interface name="effort" />
     </joint>
     <joint name="FL_a">
       <param name="node_id">1</param>
+      <command_interface name="position" />
+      <state_interface name="position" />
+      <state_interface name="velocity" />
+      <state_interface name="effort" />
     </joint>
     <joint name="FL_b">
       <param name="node_id">2</param>
+      <command_interface name="position" />
+      <state_interface name="position" />
+      <state_interface name="velocity" />
+      <state_interface name="effort" />
     </joint>
-  </ros2_control>
-  <ros2_control name="FrontRight" type="system">
-    <xacro:unless value="${use_mock_hardware}">
-      <hardware>
-        <plugin>odrive_ros2_control_plugin/ODriveHardwareInterface</plugin>
-        <group>1</group>
-        <param name="can">can1</param>
-      </hardware>
-    </xacro:unless>
-    <xacro:if value="${use_mock_hardware}">
-      <hardware>
-        <plugin>mock_components/GenericSystem</plugin>
-        <group>1</group>
-        <param name="calculate_dynamics">true</param>
-      </hardware>
-    </xacro:if>
     <joint name="FR_hip">
       <param name="node_id">3</param>
+      <command_interface name="position" />
+      <state_interface name="position" />
+      <state_interface name="velocity" />
+      <state_interface name="effort" />
     </joint>
     <joint name="FR_a">
       <param name="node_id">4</param>
+      <command_interface name="position" />
+      <state_interface name="position" />
+      <state_interface name="velocity" />
+      <state_interface name="effort" />
     </joint>
     <joint name="FR_b">
       <param name="node_id">5</param>
+      <command_interface name="position" />
+      <state_interface name="position" />
+      <state_interface name="velocity" />
+      <state_interface name="effort" />
     </joint>
-  </ros2_control>
-  <ros2_control name="BackLeft" type="system">
-    <xacro:unless value="${use_mock_hardware}">
-      <hardware>
-        <plugin>odrive_ros2_control_plugin/ODriveHardwareInterface</plugin>
-        <group>1</group>
-        <param name="can">can2</param>
-      </hardware>
-    </xacro:unless>
-    <xacro:if value="${use_mock_hardware}">
-      <hardware>
-        <plugin>mock_components/GenericSystem</plugin>
-        <group>1</group>
-        <param name="calculate_dynamics">true</param>
-      </hardware>
-    </xacro:if>
     <joint name="BL_hip">
       <param name="node_id">6</param>
+      <command_interface name="position" />
+      <state_interface name="position" />
+      <state_interface name="velocity" />
+      <state_interface name="effort" />
     </joint>
     <joint name="BL_a">
       <param name="node_id">7</param>
+      <command_interface name="position" />
+      <state_interface name="position" />
+      <state_interface name="velocity" />
+      <state_interface name="effort" />
     </joint>
     <joint name="BL_b">
       <param name="node_id">8</param>
+      <command_interface name="position" />
+      <state_interface name="position" />
+      <state_interface name="velocity" />
+      <state_interface name="effort" />
     </joint>
-  </ros2_control>
-  <ros2_control name="BackRight" type="system">
-    <xacro:unless value="${use_mock_hardware}">
-      <hardware>
-        <plugin>odrive_ros2_control_plugin/ODriveHardwareInterface</plugin>
-        <group>1</group>
-        <param name="can">can3</param>
-      </hardware>
-    </xacro:unless>
-    <xacro:if value="${use_mock_hardware}">
-      <hardware>
-        <plugin>mock_components/GenericSystem</plugin>
-        <group>1</group>
-        <param name="calculate_dynamics">true</param>
-      </hardware>
-    </xacro:if>
     <joint name="BR_hip">
       <param name="node_id">9</param>
+      <command_interface name="position" />
+      <state_interface name="position" />
+      <state_interface name="velocity" />
+      <state_interface name="effort" />
     </joint>
     <joint name="BR_a">
       <param name="node_id">10</param>
+      <command_interface name="position" />
+      <state_interface name="position" />
+      <state_interface name="velocity" />
+      <state_interface name="effort" />
     </joint>
     <joint name="BR_b">
       <param name="node_id">11</param>
+      <command_interface name="position" />
+      <state_interface name="position" />
+      <state_interface name="velocity" />
+      <state_interface name="effort" />
     </joint>
   </ros2_control>
 </robot>
