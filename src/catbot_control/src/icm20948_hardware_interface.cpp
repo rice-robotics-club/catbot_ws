@@ -7,31 +7,6 @@
 #include <unistd.h>
 
 #include "rclcpp/rclcpp.hpp"
-
-namespace {
-const char * status_to_string(ICM_20948_Status_e status) {
-  switch (status) {
-    case ICM_20948_Stat_Ok: return "Ok";
-    case ICM_20948_Stat_Err: return "Err";
-    case ICM_20948_Stat_NotImpl: return "NotImpl";
-    case ICM_20948_Stat_ParamErr: return "ParamErr";
-    case ICM_20948_Stat_WrongID: return "WrongID";
-    case ICM_20948_Stat_InvalSensor: return "InvalSensor";
-    case ICM_20948_Stat_NoData: return "NoData";
-    case ICM_20948_Stat_SensorNotSupported: return "SensorNotSupported";
-    case ICM_20948_Stat_DMPNotSupported: return "DMPNotSupported";
-    case ICM_20948_Stat_DMPVerifyFail: return "DMPVerifyFail";
-    case ICM_20948_Stat_FIFONoDataAvail: return "FIFONoDataAvail";
-    case ICM_20948_Stat_FIFOIncompleteData: return "FIFOIncompleteData";
-    case ICM_20948_Stat_FIFOMoreDataAvail: return "FIFOMoreDataAvail";
-    case ICM_20948_Stat_UnrecognisedDMPHeader: return "UnrecognisedDMPHeader";
-    case ICM_20948_Stat_UnrecognisedDMPHeader2: return "UnrecognisedDMPHeader2";
-    case ICM_20948_Stat_InvalidDMPRegister: return "InvalidDMPRegister";
-    default: return "Unknown";
-  }
-}
-}  // namespace
-
 namespace catbot_control {
 
 ICM_20948_Status_e ICM20948HardwareInterface::i2c_write_cb(uint8_t regaddr,
@@ -117,30 +92,17 @@ ICM20948HardwareInterface::export_state_interfaces() {
 }
 
 hardware_interface::CallbackReturn ICM20948HardwareInterface::on_activate(
-<<<<<<< HEAD
     const rclcpp_lifecycle::State & /*previous_state*/) {
   i2c_fd_ = open(i2c_device_.c_str(), O_RDWR);
   if (i2c_fd_ < 0) {
     RCLCPP_ERROR(rclcpp::get_logger("ICM20948HardwareInterface"),
                  "Failed to open I2C device");
-=======
-  const rclcpp_lifecycle::State & /*previous_state*/) {
-  auto logger = rclcpp::get_logger("ICM20948HardwareInterface");
-
-  i2c_fd_ = open(i2c_device_.c_str(), O_RDWR);
-  if (i2c_fd_ < 0) {
-    RCLCPP_ERROR(logger, "Failed to open I2C device: %s", i2c_device_.c_str());
->>>>>>> faeb4954bfbe206f4731252959bd032e4811e588
     return hardware_interface::CallbackReturn::ERROR;
   }
 
   if (ioctl(i2c_fd_, I2C_SLAVE, i2c_address_) < 0) {
-<<<<<<< HEAD
     RCLCPP_ERROR(rclcpp::get_logger("ICM20948HardwareInterface"),
                  "Failed to set I2C address");
-=======
-    RCLCPP_ERROR(logger, "Failed to set I2C address: 0x%02X", i2c_address_);
->>>>>>> faeb4954bfbe206f4731252959bd032e4811e588
     close(i2c_fd_);
     i2c_fd_ = -1;
     return hardware_interface::CallbackReturn::ERROR;
