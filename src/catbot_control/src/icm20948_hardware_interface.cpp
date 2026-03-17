@@ -149,7 +149,6 @@ hardware_interface::CallbackReturn ICM20948HardwareInterface::on_activate(
   ICM_20948_init_struct(&icm_device_);
   ICM_20948_link_serif(&icm_device_, &icm_serif_);
 
-<<<<<<< HEAD
   while (ICM_20948_check_id(&icm_device_) != ICM_20948_Stat_Ok) {
     RCLCPP_WARN(rclcpp::get_logger("ICM20948HardwareInterface"),
                 "Failed to verify ICM20948 ID, retrying...");
@@ -196,55 +195,6 @@ hardware_interface::CallbackReturn ICM20948HardwareInterface::on_activate(
   ICM_20948_sleep(&icm_device_, false);
   ICM_20948_low_power(&icm_device_, false);
 
-=======
-  // Probe/bring-up loop: verify the device responds correctly before activation succeeds.
-  ICM_20948_Status_e status = ICM_20948_Stat_Err;
-  for (int attempt = 0; attempt < 10; ++attempt) {
-    status = ICM_20948_check_id(&icm_device_);
-    if (status == ICM_20948_Stat_Ok) {
-      break;
-    }
-    usleep(10000);  // 10 ms between retries
-  }
-
-  if (status != ICM_20948_Stat_Ok) {
-    RCLCPP_ERROR(
-      logger,
-      "ICM20948 probe failed (check_id): %s. Verify wiring, address, and bus.",
-      status_to_string(status));
-    close(i2c_fd_);
-    i2c_fd_ = -1;
-    return hardware_interface::CallbackReturn::ERROR;
-  }
-
-  status = ICM_20948_sw_reset(&icm_device_);
-  if (status != ICM_20948_Stat_Ok) {
-    RCLCPP_ERROR(logger, "ICM20948 software reset failed: %s", status_to_string(status));
-    close(i2c_fd_);
-    i2c_fd_ = -1;
-    return hardware_interface::CallbackReturn::ERROR;
-  }
-
-  usleep(100000);  // allow reset to complete
-
-  status = ICM_20948_sleep(&icm_device_, false);
-  if (status != ICM_20948_Stat_Ok) {
-    RCLCPP_ERROR(logger, "ICM20948 wake-from-sleep failed: %s", status_to_string(status));
-    close(i2c_fd_);
-    i2c_fd_ = -1;
-    return hardware_interface::CallbackReturn::ERROR;
-  }
-
-  status = ICM_20948_low_power(&icm_device_, false);
-  if (status != ICM_20948_Stat_Ok) {
-    RCLCPP_ERROR(logger, "ICM20948 disable-low-power failed: %s", status_to_string(status));
-    close(i2c_fd_);
-    i2c_fd_ = -1;
-    return hardware_interface::CallbackReturn::ERROR;
-  }
-
-  RCLCPP_INFO(logger, "ICM20948 initialized on %s at 0x%02X", i2c_device_.c_str(), i2c_address_);
->>>>>>> faeb4954bfbe206f4731252959bd032e4811e588
   return hardware_interface::CallbackReturn::SUCCESS;
 }
 
