@@ -1,0 +1,26 @@
+icm20948_ros2_control:
+  sensor_name:
+    {
+      type: string,
+      default_value: "imu",
+      read_only: true,
+      description: "The sensor name, used as the Imu interface prefix.",
+    }
+  use_dlpf:
+    {
+      type: bool,
+      default_value: false,
+      description: "Whether to use digital lowpass filtering.",
+    }
+  i2c_device:
+    {
+      type: string,
+      default_value: "/dev/i2c-1",
+      description: "The I2C device file, defaults to /dev/i2c-1.",
+    }
+  i2c_address:
+    {
+      type: int,
+      default_value: 0x69,
+      description: "The I2C address of the sensor, defaults to 0x69.",
+    }

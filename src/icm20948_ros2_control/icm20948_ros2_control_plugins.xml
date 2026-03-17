@@ -1,0 +1,11 @@
+<library path="icm20948_ros2_control">
+  <class
+    name="icm20948_ros2_control/ICM20948HardwareInterface"
+    type="icm20948_ros2_control::ICM20948HardwareInterface"
+    base_class_type="hardware_interface::SensorInterface"
+  >
+    <description>
+      The ICM20948 hardware interface provides sensor data from the ICM20948 IMU.
+    </description>
+  </class>
+</library>

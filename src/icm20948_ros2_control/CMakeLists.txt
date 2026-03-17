@@ -1,9 +1,12 @@
 cmake_minimum_required(VERSION 3.8)
-project(catbot_control)
+project(icm20948_ros2_control)
 
-# find dependencies
-find_package(ros2_control_cmake REQUIRED)
+if(CMAKE_COMPILER_IS_GNUCXX OR CMAKE_CXX_COMPILER_ID MATCHES "Clang")
+  add_compile_options(-Wall -Wextra -Wpedantic)
+endif()
+
 find_package(ament_cmake REQUIRED)
+find_package(ros2_control_cmake REQUIRED)
 find_package(rclcpp REQUIRED)
 find_package(rclcpp_lifecycle REQUIRED)
 find_package(pluginlib REQUIRED)
@@ -11,17 +14,17 @@ find_package(control_msgs REQUIRED)
 find_package(builtin_interfaces REQUIRED)
 find_package(controller_interface REQUIRED)
 find_package(hardware_interface REQUIRED)
-find_package(urdf REQUIRED)
 find_package(sensor_msgs REQUIRED)
 find_package(realtime_tools REQUIRED)
 find_package(generate_parameter_library REQUIRED)
 
-# generate_parameter_library(joint_state_broadcaster_parameters
-#   src/joint_state_broadcaster_parameters.yaml
-# )
+generate_parameter_library(icm20948_interface_parameters
+  src/icm20948_interface_parameters.yaml
+)
 
 add_library(${PROJECT_NAME} SHARED
-  # src/joint_state_broadcaster.cpp\
+  src/icm20948_interface.cpp
+  external/icm20948/ICM_20948_C.c
 )
 target_compile_features(${PROJECT_NAME} PUBLIC cxx_std_17)
 target_include_directories(${PROJECT_NAME} PUBLIC
@@ -30,7 +33,7 @@ target_include_directories(${PROJECT_NAME} PUBLIC
   $<INSTALL_INTERFACE:include>
 )
 target_link_libraries(${PROJECT_NAME} PUBLIC
-                      # joint_state_broadcaster_parameters
+                      icm20948_interface_parameters
                       controller_interface::controller_interface
                       hardware_interface::hardware_interface
                       pluginlib::pluginlib
@@ -42,13 +45,8 @@ target_link_libraries(${PROJECT_NAME} PUBLIC
                       ${control_msgs_TARGETS}
                       ${builtin_interfaces_TARGETS})
 
-# Export Plugins
-# pluginlib_export_plugin_description_file(controller_interface catbot_control_plugins.xml)
 
-install(
-  DIRECTORY urdf config launch
-  DESTINATION share/${PROJECT_NAME}
-)
+pluginlib_export_plugin_description_file(hardware_interface icm20948_ros2_control_plugins.xml)
 
 install(
   DIRECTORY include/
@@ -64,17 +62,16 @@ install(
   LIBRARY DESTINATION lib
 )
 
-ament_export_targets(export_${PROJECT_NAME} HAS_LIBRARY_TARGET)
-ament_export_dependencies(
-  builtin_interfaces
-  control_msgs
-  controller_interface
-  hardware_interface
-  pluginlib
-  rclcpp
-  rclcpp_lifecycle
-  realtime_tools
-  sensor_msgs
-  urdf
-)
+if(BUILD_TESTING)
+  find_package(ament_lint_auto REQUIRED)
+  # the following line skips the linter which checks for copyrights
+  # comment the line when a copyright and license is added to all source files
+  set(ament_cmake_copyright_FOUND TRUE)
+  # the following line skips cpplint (only works in a git repo)
+  # comment the line when this package is in a git repo and when
+  # a copyright and license is added to all source files
+  set(ament_cmake_cpplint_FOUND TRUE)
+  ament_lint_auto_find_test_dependencies()
+endif()
+
 ament_package()

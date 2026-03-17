@@ -8,13 +8,4 @@
       The catbot joint state broadcaster publishes all necessary joint interfaces for actuated and non-actuated joints.
     </description>
   </class> -->
-  <class
-    name="catbot_control/ICM20948HardwareInterface"
-    type="catbot_control::ICM20948HardwareInterface"
-    base_class_type="hardware_interface::SensorInterface"
-  >
-    <description>
-      The ICM20948 hardware interface provides sensor data from the ICM20948 IMU.
-    </description>
-  </class>
 </library>
