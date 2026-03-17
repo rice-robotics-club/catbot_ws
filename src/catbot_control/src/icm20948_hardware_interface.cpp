@@ -207,7 +207,6 @@ hardware_interface::CallbackReturn ICM20948HardwareInterface::on_deactivate(
   return hardware_interface::CallbackReturn::SUCCESS;
 }
 
-<<<<<<< HEAD
 hardware_interface::return_type
 ICM20948HardwareInterface::read(const rclcpp::Time & /*time*/,
                                 const rclcpp::Duration & /*period*/) {
@@ -218,24 +217,7 @@ ICM20948HardwareInterface::read(const rclcpp::Time & /*time*/,
   if (ICM_20948_get_agmt(&icm_device_, &agmt) != ICM_20948_Stat_Ok) {
     RCLCPP_ERROR(rclcpp::get_logger("ICM20948HardwareInterface"),
                  "Failed to read ICM20948 sensor data");
-=======
-hardware_interface::return_type ICM20948HardwareInterface::read(
-  const rclcpp::Time & /*time*/, const rclcpp::Duration & /*period*/) {
-  auto logger = rclcpp::get_logger("ICM20948HardwareInterface");
-
-  if (i2c_fd_ < 0) {
-    RCLCPP_ERROR_THROTTLE(logger, *rclcpp::get_clock(), 2000, "I2C fd is invalid during read()");
->>>>>>> faeb4954bfbe206f4731252959bd032e4811e588
     return hardware_interface::return_type::ERROR;
-  }
-
-  ICM_20948_AGMT_t agmt{};
-  const ICM_20948_Status_e status = ICM_20948_get_agmt(&icm_device_, &agmt);
-  if (status != ICM_20948_Stat_Ok) {
-    RCLCPP_WARN_THROTTLE(
-      logger, *rclcpp::get_clock(), 2000,
-      "ICM20948 read failed: %s", status_to_string(status));
-    return hardware_interface::return_type::OK;
   }
 
   hw_sensor_states_[4] = static_cast<double>(agmt.acc.axes.x);
@@ -244,12 +226,6 @@ hardware_interface::return_type ICM20948HardwareInterface::read(
   hw_sensor_states_[7] = static_cast<double>(agmt.gyr.axes.x);
   hw_sensor_states_[8] = static_cast<double>(agmt.gyr.axes.y);
   hw_sensor_states_[9] = static_cast<double>(agmt.gyr.axes.z);
-
-  RCLCPP_DEBUG_THROTTLE(
-    logger, *rclcpp::get_clock(), 5000,
-    "IMU acc=[%.3f %.3f %.3f] gyr=[%.3f %.3f %.3f]",
-    hw_sensor_states_[4], hw_sensor_states_[5], hw_sensor_states_[6],
-    hw_sensor_states_[7], hw_sensor_states_[8], hw_sensor_states_[9]);
 
   return hardware_interface::return_type::OK;
 }
