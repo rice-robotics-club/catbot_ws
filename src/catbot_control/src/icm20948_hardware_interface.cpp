@@ -8,6 +8,30 @@
 
 #include "rclcpp/rclcpp.hpp"
 
+namespace {
+const char * status_to_string(ICM_20948_Status_e status) {
+  switch (status) {
+    case ICM_20948_Stat_Ok: return "Ok";
+    case ICM_20948_Stat_Err: return "Err";
+    case ICM_20948_Stat_NotImpl: return "NotImpl";
+    case ICM_20948_Stat_ParamErr: return "ParamErr";
+    case ICM_20948_Stat_WrongID: return "WrongID";
+    case ICM_20948_Stat_InvalSensor: return "InvalSensor";
+    case ICM_20948_Stat_NoData: return "NoData";
+    case ICM_20948_Stat_SensorNotSupported: return "SensorNotSupported";
+    case ICM_20948_Stat_DMPNotSupported: return "DMPNotSupported";
+    case ICM_20948_Stat_DMPVerifyFail: return "DMPVerifyFail";
+    case ICM_20948_Stat_FIFONoDataAvail: return "FIFONoDataAvail";
+    case ICM_20948_Stat_FIFOIncompleteData: return "FIFOIncompleteData";
+    case ICM_20948_Stat_FIFOMoreDataAvail: return "FIFOMoreDataAvail";
+    case ICM_20948_Stat_UnrecognisedDMPHeader: return "UnrecognisedDMPHeader";
+    case ICM_20948_Stat_UnrecognisedDMPHeader2: return "UnrecognisedDMPHeader2";
+    case ICM_20948_Stat_InvalidDMPRegister: return "InvalidDMPRegister";
+    default: return "Unknown";
+  }
+}
+}  // namespace
+
 namespace catbot_control {
 
 ICM_20948_Status_e ICM20948HardwareInterface::i2c_write_cb(uint8_t regaddr,
@@ -93,17 +117,30 @@ ICM20948HardwareInterface::export_state_interfaces() {
 }
 
 hardware_interface::CallbackReturn ICM20948HardwareInterface::on_activate(
+<<<<<<< HEAD
     const rclcpp_lifecycle::State & /*previous_state*/) {
   i2c_fd_ = open(i2c_device_.c_str(), O_RDWR);
   if (i2c_fd_ < 0) {
     RCLCPP_ERROR(rclcpp::get_logger("ICM20948HardwareInterface"),
                  "Failed to open I2C device");
+=======
+  const rclcpp_lifecycle::State & /*previous_state*/) {
+  auto logger = rclcpp::get_logger("ICM20948HardwareInterface");
+
+  i2c_fd_ = open(i2c_device_.c_str(), O_RDWR);
+  if (i2c_fd_ < 0) {
+    RCLCPP_ERROR(logger, "Failed to open I2C device: %s", i2c_device_.c_str());
+>>>>>>> faeb4954bfbe206f4731252959bd032e4811e588
     return hardware_interface::CallbackReturn::ERROR;
   }
 
   if (ioctl(i2c_fd_, I2C_SLAVE, i2c_address_) < 0) {
+<<<<<<< HEAD
     RCLCPP_ERROR(rclcpp::get_logger("ICM20948HardwareInterface"),
                  "Failed to set I2C address");
+=======
+    RCLCPP_ERROR(logger, "Failed to set I2C address: 0x%02X", i2c_address_);
+>>>>>>> faeb4954bfbe206f4731252959bd032e4811e588
     close(i2c_fd_);
     i2c_fd_ = -1;
     return hardware_interface::CallbackReturn::ERROR;
@@ -112,6 +149,7 @@ hardware_interface::CallbackReturn ICM20948HardwareInterface::on_activate(
   ICM_20948_init_struct(&icm_device_);
   ICM_20948_link_serif(&icm_device_, &icm_serif_);
 
+<<<<<<< HEAD
   while (ICM_20948_check_id(&icm_device_) != ICM_20948_Stat_Ok) {
     RCLCPP_WARN(rclcpp::get_logger("ICM20948HardwareInterface"),
                 "Failed to verify ICM20948 ID, retrying...");
@@ -158,6 +196,55 @@ hardware_interface::CallbackReturn ICM20948HardwareInterface::on_activate(
   ICM_20948_sleep(&icm_device_, false);
   ICM_20948_low_power(&icm_device_, false);
 
+=======
+  // Probe/bring-up loop: verify the device responds correctly before activation succeeds.
+  ICM_20948_Status_e status = ICM_20948_Stat_Err;
+  for (int attempt = 0; attempt < 10; ++attempt) {
+    status = ICM_20948_check_id(&icm_device_);
+    if (status == ICM_20948_Stat_Ok) {
+      break;
+    }
+    usleep(10000);  // 10 ms between retries
+  }
+
+  if (status != ICM_20948_Stat_Ok) {
+    RCLCPP_ERROR(
+      logger,
+      "ICM20948 probe failed (check_id): %s. Verify wiring, address, and bus.",
+      status_to_string(status));
+    close(i2c_fd_);
+    i2c_fd_ = -1;
+    return hardware_interface::CallbackReturn::ERROR;
+  }
+
+  status = ICM_20948_sw_reset(&icm_device_);
+  if (status != ICM_20948_Stat_Ok) {
+    RCLCPP_ERROR(logger, "ICM20948 software reset failed: %s", status_to_string(status));
+    close(i2c_fd_);
+    i2c_fd_ = -1;
+    return hardware_interface::CallbackReturn::ERROR;
+  }
+
+  usleep(100000);  // allow reset to complete
+
+  status = ICM_20948_sleep(&icm_device_, false);
+  if (status != ICM_20948_Stat_Ok) {
+    RCLCPP_ERROR(logger, "ICM20948 wake-from-sleep failed: %s", status_to_string(status));
+    close(i2c_fd_);
+    i2c_fd_ = -1;
+    return hardware_interface::CallbackReturn::ERROR;
+  }
+
+  status = ICM_20948_low_power(&icm_device_, false);
+  if (status != ICM_20948_Stat_Ok) {
+    RCLCPP_ERROR(logger, "ICM20948 disable-low-power failed: %s", status_to_string(status));
+    close(i2c_fd_);
+    i2c_fd_ = -1;
+    return hardware_interface::CallbackReturn::ERROR;
+  }
+
+  RCLCPP_INFO(logger, "ICM20948 initialized on %s at 0x%02X", i2c_device_.c_str(), i2c_address_);
+>>>>>>> faeb4954bfbe206f4731252959bd032e4811e588
   return hardware_interface::CallbackReturn::SUCCESS;
 }
 
@@ -170,6 +257,7 @@ hardware_interface::CallbackReturn ICM20948HardwareInterface::on_deactivate(
   return hardware_interface::CallbackReturn::SUCCESS;
 }
 
+<<<<<<< HEAD
 hardware_interface::return_type
 ICM20948HardwareInterface::read(const rclcpp::Time & /*time*/,
                                 const rclcpp::Duration & /*period*/) {
@@ -180,15 +268,38 @@ ICM20948HardwareInterface::read(const rclcpp::Time & /*time*/,
   if (ICM_20948_get_agmt(&icm_device_, &agmt) != ICM_20948_Stat_Ok) {
     RCLCPP_ERROR(rclcpp::get_logger("ICM20948HardwareInterface"),
                  "Failed to read ICM20948 sensor data");
+=======
+hardware_interface::return_type ICM20948HardwareInterface::read(
+  const rclcpp::Time & /*time*/, const rclcpp::Duration & /*period*/) {
+  auto logger = rclcpp::get_logger("ICM20948HardwareInterface");
+
+  if (i2c_fd_ < 0) {
+    RCLCPP_ERROR_THROTTLE(logger, *rclcpp::get_clock(), 2000, "I2C fd is invalid during read()");
+>>>>>>> faeb4954bfbe206f4731252959bd032e4811e588
     return hardware_interface::return_type::ERROR;
   }
 
-  hw_sensor_states_[4] = agmt.acc.axes.x;
-  hw_sensor_states_[5] = agmt.acc.axes.y;
-  hw_sensor_states_[6] = agmt.acc.axes.z;
-  hw_sensor_states_[7] = agmt.gyr.axes.x;
-  hw_sensor_states_[8] = agmt.gyr.axes.y;
-  hw_sensor_states_[9] = agmt.gyr.axes.z;
+  ICM_20948_AGMT_t agmt{};
+  const ICM_20948_Status_e status = ICM_20948_get_agmt(&icm_device_, &agmt);
+  if (status != ICM_20948_Stat_Ok) {
+    RCLCPP_WARN_THROTTLE(
+      logger, *rclcpp::get_clock(), 2000,
+      "ICM20948 read failed: %s", status_to_string(status));
+    return hardware_interface::return_type::OK;
+  }
+
+  hw_sensor_states_[4] = static_cast<double>(agmt.acc.axes.x);
+  hw_sensor_states_[5] = static_cast<double>(agmt.acc.axes.y);
+  hw_sensor_states_[6] = static_cast<double>(agmt.acc.axes.z);
+  hw_sensor_states_[7] = static_cast<double>(agmt.gyr.axes.x);
+  hw_sensor_states_[8] = static_cast<double>(agmt.gyr.axes.y);
+  hw_sensor_states_[9] = static_cast<double>(agmt.gyr.axes.z);
+
+  RCLCPP_DEBUG_THROTTLE(
+    logger, *rclcpp::get_clock(), 5000,
+    "IMU acc=[%.3f %.3f %.3f] gyr=[%.3f %.3f %.3f]",
+    hw_sensor_states_[4], hw_sensor_states_[5], hw_sensor_states_[6],
+    hw_sensor_states_[7], hw_sensor_states_[8], hw_sensor_states_[9]);
 
   return hardware_interface::return_type::OK;
 }
