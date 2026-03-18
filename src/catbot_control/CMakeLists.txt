@@ -20,27 +20,27 @@ find_package(generate_parameter_library REQUIRED)
 #   src/joint_state_broadcaster_parameters.yaml
 # )
 
-add_library(${PROJECT_NAME} SHARED
-  # src/joint_state_broadcaster.cpp\
-)
-target_compile_features(${PROJECT_NAME} PUBLIC cxx_std_17)
-target_include_directories(${PROJECT_NAME} PUBLIC
-  $<BUILD_INTERFACE:${PROJECT_SOURCE_DIR}/include>
-  $<BUILD_INTERFACE:${PROJECT_SOURCE_DIR}/external>
-  $<INSTALL_INTERFACE:include>
-)
-target_link_libraries(${PROJECT_NAME} PUBLIC
-                      # joint_state_broadcaster_parameters
-                      controller_interface::controller_interface
-                      hardware_interface::hardware_interface
-                      pluginlib::pluginlib
-                      rclcpp::rclcpp
-                      rclcpp_lifecycle::rclcpp_lifecycle
-                      realtime_tools::realtime_tools
-                      urdf::urdf
-                      ${sensor_msgs_TARGETS}
-                      ${control_msgs_TARGETS}
-                      ${builtin_interfaces_TARGETS})
+# add_library(${PROJECT_NAME} SHARED
+#   # src/joint_state_broadcaster.cpp\
+# )
+# target_compile_features(${PROJECT_NAME} PUBLIC cxx_std_17)
+# target_include_directories(${PROJECT_NAME} PUBLIC
+#   $<BUILD_INTERFACE:${PROJECT_SOURCE_DIR}/include>
+#   $<BUILD_INTERFACE:${PROJECT_SOURCE_DIR}/external>
+#   $<INSTALL_INTERFACE:include>
+# )
+# target_link_libraries(${PROJECT_NAME} PUBLIC
+#                       # joint_state_broadcaster_parameters
+#                       controller_interface::controller_interface
+#                       hardware_interface::hardware_interface
+#                       pluginlib::pluginlib
+#                       rclcpp::rclcpp
+#                       rclcpp_lifecycle::rclcpp_lifecycle
+#                       realtime_tools::realtime_tools
+#                       urdf::urdf
+#                       ${sensor_msgs_TARGETS}
+#                       ${control_msgs_TARGETS}
+#                       ${builtin_interfaces_TARGETS})
 
 # Export Plugins
 # pluginlib_export_plugin_description_file(controller_interface catbot_control_plugins.xml)
