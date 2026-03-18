@@ -55,16 +55,16 @@ install(
   DESTINATION include/
 )
 
-install(
-  TARGETS
-    ${PROJECT_NAME}
-  EXPORT export_${PROJECT_NAME}
-  RUNTIME DESTINATION bin
-  ARCHIVE DESTINATION lib
-  LIBRARY DESTINATION lib
-)
+# install(
+#   TARGETS
+#     ${PROJECT_NAME}
+#   EXPORT export_${PROJECT_NAME}
+#   RUNTIME DESTINATION bin
+#   ARCHIVE DESTINATION lib
+#   LIBRARY DESTINATION lib
+# )
 
-ament_export_targets(export_${PROJECT_NAME} HAS_LIBRARY_TARGET)
+# ament_export_targets(export_${PROJECT_NAME} HAS_LIBRARY_TARGET)
 ament_export_dependencies(
   builtin_interfaces
   control_msgs
