@@ -4,7 +4,7 @@
   <xacro:include filename="$(find catbot_leg_description)/urdf/robot.urdf" />
   <ros2_control name="IMU" type="sensor">
     <hardware>
-      <plugin>icm20948_ros2_control/ICM20948HardwareInterface</plugin>
+      <plugin>icm20948_ros2_control/ICM20948Interface</plugin>
     </hardware>
     <sensor name="imu">
       <state_interface name="orientation.x" />
