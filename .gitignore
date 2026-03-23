@@ -1,4 +1,10 @@
+# Development directories
+.zed/
 .vscode/
-install/
-build/
-log/
+.cache/
+
+# Colcon directories
+install/*
+build/*
+log/*
+.ccache/*
