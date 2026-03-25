@@ -7,6 +7,6 @@
 [submodule "src/catbot_leg_description"]
 	path = src/catbot_leg_description
 	url = https://github.com/rice-robotics-club/catbot_leg_description.git
-[submodule "src/icm20948_ros2_control"]
-	path = src/icm20948_ros2_control
-	url = https://github.com/lopatoj/icm20948_ros2_control.git
+[submodule "src/icm20948_hardware"]
+	path = src/icm20948_hardware
+	url = https://github.com/lopatoj/icm20948_hardware.git
