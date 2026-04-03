@@ -53,19 +53,63 @@ def wrap_angle(rad_angle):
     return (rad_angle + math.pi) % (2 * math.pi) - math.pi
 
 def find_tb_tc(x_EE, z_EE, L_1, L_2):
+    if (math.sqrt(x_EE**2 + z_EE**2) > math.sqrt(L_1**2 + L_2**2)):
+        print("Leg position unreachable!", x_EE, z_EE)
+        return None, None
     t_c = math.acos((x_EE**2 + z_EE**2 - L_1**2 - L_2**2) / (2*L_1*L_2))
     t_b = math.atan2(z_EE, x_EE)
     t_b = t_b - math.atan2(L_2*math.sin(t_c), L_1 + L_2 * math.cos(t_c))
     # Wrap to (-pi, pi]
     wrapped_t_b = wrap_angle(t_b)
-    return wrapped_t_b, t_c
+    return wrapped_t_b, t_c 
 
 def convert_tb_tc_to_ta_tl(t_b, t_c, l0, l1, l2, l3): # NOTE: l0-->l3 = 4-bar linkage links, with l0 = ground
     t_3 = t_b + math.pi
     t_a = calculate_theta3(l0, l3, l2, l1, t_3, open_mode=False) # degrees NOTE: l3 and l1 are flipped because doing IK instead of FK
+    if (t_a is None):
+        print("Linkage not solvable!")
+        return None, None
+
     t_a = t_a + 180
     t_l = math.degrees(t_3 + t_c) + 180
     return t_a, t_l
+
+def calculate_leg_ik(target_pos : np.array, L_0, L_1, L_2, l0, l1, l2, l3):
+    """ 
+    Given desired position of leg EE and lengths of leg, output angles of leg
+    note: this does NOT consider configuration of leg 
+    assumptions: 
+    1. assuming leg is two linkages in series with output angles = angle at each linkage
+    2. L1 != L2
+    3. hip and upper_leg axes intersect
+    input: 
+    1. Desired position of leg EE (w.r.t point of intersection between hip and upper_leg axes). 
+       If leg is below the chassis (almost always), Z is negative.
+    2. L_0, L_1, L_2 = lengths between the following joints: hip->upper_leg, upper_leg->lower_leg, lower_leg->EE
+    output: list of solutions (usually 2) [[hip_angle, upper_angle, lower_angle], [...]]
+    3. l0, l1, l2, l3 = linkage lengths, with l0 = ground, and l1 
+    """
+    x, y, z = target_pos[0], target_pos[1], target_pos[2]
+
+    t_h, L_12 = solve_for_th_L12(z, y, L_0)
+    if t_h > math.pi/2 or t_h < -math.pi/2:
+        print("Hip angle invalid! - IK not solved", t_h)
+        return None, None, None
+    
+    if z < 0:
+        # negate L_12 because converting a scalar val to signed val
+        L_12=-L_12
+    t_b, t_c = find_tb_tc(x_EE=x, z_EE=L_12, L_1=L_1, L_2=L_2)
+    if t_b is None or t_c is None:
+        print("Leg angle invalid! - IK not solved")
+        return None, None, None
+    
+    t_a, t_l = convert_tb_tc_to_ta_tl(t_b, t_c, l0, l1, l2, l3)
+    if t_a is None or t_l is None:
+        print("Linkage invalid! - IK not solved")
+        return None, None, None
+
+    return t_h, t_a, t_l
 
 
 # TESTS:
@@ -85,33 +129,6 @@ def convert_tb_tc_to_ta_tl(t_b, t_c, l0, l1, l2, l3): # NOTE: l0-->l3 = 4-bar li
 # |            <-- = -L0
 # | 
 # | L12  
-
-def calculate_leg_ik(target_pos : np.array, L_0, L_1, L_2, l0, l1, l2, l3) -> np.array:
-    """ 
-    Given desired position of leg EE and lengths of leg, output angles of leg
-    note: this does NOT consider configuration of leg 
-    assumptions: 
-    1. assuming leg is two linkages in series with output angles = angle at each linkage
-    2. L1 != L2
-    3. hip and upper_leg axes intersect
-    input: 
-    1. Desired position of leg EE (w.r.t point of intersection between hip and upper_leg axes). 
-       If leg is below the chassis (almost always), Z is negative.
-    2. L_0, L_1, L_2 = lengths between the following joints: hip->upper_leg, upper_leg->lower_leg, lower_leg->EE
-    output: list of solutions (usually 2) [[hip_angle, upper_angle, lower_angle], [...]]
-    3. l0, l1, l2, l3 = linkage lengths, with l0 = ground, and l1 
-    """
-    x, y, z = target_pos[0], target_pos[1], target_pos[2]
-
-    t_h, L_12 = solve_for_th_L12(z, y, L_0)
-    if z < 0:
-        # negate L_12 because converting a scalar val to signed val
-        L_12=-L_12
-    t_b, t_c = find_tb_tc(x_EE=x, z_EE=L_12, L_1=L_1, L_2=L_2)
-    t_a, t_l = convert_tb_tc_to_ta_tl(t_b, t_c, l0, l1, l2, l3)
-
-    return t_h, t_a, t_l
-
 
 # print(calculate_leg_ik(target_pos=[-27,-3.5,-20], L_0=-3.5, L_1=20.7, L_2=15, l0=8.5, l1=6.2, l2=8.7, l3=16.63))
 print(calculate_leg_ik(target_pos=[-5,3.5,-10], L_0=3.5, L_1=20.7, L_2=15, l0=8.5, l1=6.2, l2=8.7, l3=16.63))
