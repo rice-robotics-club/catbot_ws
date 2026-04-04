@@ -1,4 +1,9 @@
 .vscode/
-install/
-build/
-log/
+.cache/
+VENV_catbot/
+
+# Colcon directories
+install/*
+build/*
+log/*
+.ccache/*
