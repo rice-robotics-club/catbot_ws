@@ -1,4 +1,0 @@
-python3-adafruit-circuitpython-icm20x:
-  ubuntu:
-    pip:
-      packages: [adafruit-circuitpython-icm20x]

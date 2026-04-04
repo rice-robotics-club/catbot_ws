@@ -1,6 +1,4 @@
 from launch import LaunchDescription
-from launch.actions import RegisterEventHandler
-from launch.event_handlers import OnProcessExit
 from launch.substitutions import (
     Command,
     FindExecutable,
@@ -20,7 +18,7 @@ def generate_launch_description():
                 [
                     FindPackageShare("catbot_control"),
                     "urdf",
-                    "catbot_leg.urdf.xacro",
+                    "catbot_leg_imu.urdf.xacro",
                 ]
             ),
         ]
@@ -28,15 +26,13 @@ def generate_launch_description():
     robot_description = {
         "robot_description": ParameterValue(robot_description_content, value_type=str)
     }
-
     robot_controllers = PathJoinSubstitution(
         [
             FindPackageShare("catbot_control"),
             "config",
-            "controllers.yaml",
+            "imu_test.yaml",
         ]
     )
-
     control_node = Node(
         package="controller_manager",
         executable="ros2_control_node",
@@ -49,41 +45,20 @@ def generate_launch_description():
         output="both",
         parameters=[robot_description],
     )
-
-    joint_state_broadcaster_spawner = Node(
+    imu_state_broadcaster_spawner = Node(
         package="controller_manager",
         executable="spawner",
         arguments=[
-            "joint_state_broadcaster",
+            "imu_sensor_broadcaster",
             "--controller-manager",
             "/controller_manager",
         ],
-    )
-
-    robot_controller_spawner = Node(
-        package="controller_manager",
-        executable="spawner",
-        arguments=[
-            "joint_position_controller",
-            "--controller-manager",
-            "/controller_manager",
-        ],
-    )
-
-    delay_robot_controller_spawner_after_joint_state_broadcaster_spawner = (
-        RegisterEventHandler(
-            event_handler=OnProcessExit(
-                target_action=joint_state_broadcaster_spawner,
-                on_exit=[robot_controller_spawner],
-            )
-        )
     )
 
     nodes = [
         control_node,
         robot_state_pub_node,
-        joint_state_broadcaster_spawner,
-        delay_robot_controller_spawner_after_joint_state_broadcaster_spawner,
+        imu_state_broadcaster_spawner,
     ]
 
     return LaunchDescription(nodes)

@@ -1,3 +1,5 @@
+# Development directories
+.zed/
 .vscode/
 .cache/
 VENV_catbot/
