@@ -26,7 +26,7 @@
       <actuator name="actuator_a" role="actuator_a" />
       <joint name="a" role="a">
         <mechanical_reduction>8.0</mechanical_reduction>
-        <offset>0.0</offset>
+        <offset>345.0</offset>
       </joint>
     </transmission>
     <transmission name="l_transmission">
@@ -34,7 +34,7 @@
       <actuator name="actuator_l" role="actuator_l" />
       <joint name="l" role="l">
         <mechanical_reduction>8.0</mechanical_reduction>
-        <offset>0.0</offset>
+        <offset>110.0</offset>
       </joint>
     </transmission>
   </ros2_control>
