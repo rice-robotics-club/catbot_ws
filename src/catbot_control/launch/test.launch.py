@@ -1,3 +1,5 @@
+from this import s
+
 from launch import LaunchDescription
 from launch.actions import RegisterEventHandler
 from launch.event_handlers import OnProcessExit
@@ -28,15 +30,25 @@ def generate_launch_description():
     robot_description = {
         "robot_description": ParameterValue(robot_description_content, value_type=str)
     }
+    rviz_config = PathJoinSubstitution(
+        [
+            FindPackageShare("catbot_leg_description"),
+            "rviz",
+            "preview.rviz",
+        ]
+    )
 
     model_path = {
-        "model_path": ParameterValue(PathJoinSubstitution(
-            [
-                FindPackageShare("onnxruntime_controller"),
-                "models",
-                "policy.onnx",
-            ]
-        ), value_type=str)
+        "model_path": ParameterValue(
+            PathJoinSubstitution(
+                [
+                    FindPackageShare("onnxruntime_controller"),
+                    "models",
+                    "policy.onnx",
+                ]
+            ),
+            value_type=str,
+        )
     }
 
     robot_controllers = PathJoinSubstitution(
@@ -52,6 +64,9 @@ def generate_launch_description():
         executable="ros2_control_node",
         parameters=[robot_description, robot_controllers, model_path],
         output="both",
+        remappings=[
+            ("/joint_states", "/hardware_joint_states"),
+        ],
     )
 
     robot_state_pub_node = Node(
@@ -81,33 +96,27 @@ def generate_launch_description():
         ],
     )
 
-    robot_controller_spawner = Node(
-        package="controller_manager",
-        executable="spawner",
-        arguments=[
-            "onnxruntime_controller",
-            "--controller-manager",
-            "/controller_manager",
-        ],
+    rviz_node = Node(
+        package="rviz2",
+        executable="rviz2",
+        output="screen",
+        arguments=["-d", rviz_config],
     )
 
-    delay_robot_controller_spawner_after_joint_state_broadcaster_spawner = (
-        RegisterEventHandler(
-            event_handler=OnProcessExit(
-                target_action=joint_state_broadcaster_spawner,
-                on_exit=[robot_controller_spawner],
-            )
-        )
+    joint_state_publisher_gui_node = Node(
+        package="joint_state_publisher_gui",
+        executable="joint_state_publisher_gui",
+        output="screen",
+        parameters=[{"source_list": ["/hardware_joint_states"]}],
     )
-
 
     nodes = [
         control_node,
         robot_state_pub_node,
         joint_state_broadcaster_spawner,
         imu_sensor_broadcaster_spawner,
-        # robot_controller_spawner,
-        delay_robot_controller_spawner_after_joint_state_broadcaster_spawner,
+        rviz_node,
+        joint_state_publisher_gui_node,
     ]
 
     return LaunchDescription(nodes)
