@@ -32,7 +32,7 @@ def generate_launch_description():
     model_path = {
         "model_path": ParameterValue(PathJoinSubstitution(
             [
-                FindPackageShare("onnxruntime_controller"),
+                FindPackageShare("catbot_control"),
                 "models",
                 "policy.onnx",
             ]
@@ -52,6 +52,9 @@ def generate_launch_description():
         executable="ros2_control_node",
         parameters=[robot_description, robot_controllers, model_path],
         output="both",
+        remappings=[
+            ("/joint_states", "/hardware_joint_states"),
+        ],
     )
 
     robot_state_pub_node = Node(
@@ -68,9 +71,6 @@ def generate_launch_description():
             "joint_state_broadcaster",
             "--controller-manager",
             "/controller_manager",
-        ],
-        remappings=[
-            ("/joint_states", "/hardware_joint_states"),
         ],
     )
 

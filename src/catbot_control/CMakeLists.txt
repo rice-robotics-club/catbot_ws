@@ -46,7 +46,7 @@ find_package(generate_parameter_library REQUIRED)
 # pluginlib_export_plugin_description_file(controller_interface catbot_control_plugins.xml)
 
 install(
-  DIRECTORY urdf config launch
+  DIRECTORY urdf config launch models
   DESTINATION share/${PROJECT_NAME}
 )
 

@@ -466,6 +466,7 @@ environments:
       - conda: https://conda.anaconda.org/robostack-jazzy/linux-aarch64/ros-jazzy-image-geometry-4.1.0-np2py312h6b1b059_16.conda
       - conda: https://conda.anaconda.org/robostack-jazzy/linux-aarch64/ros-jazzy-image-tools-0.33.9-np2py312h6b1b059_16.conda
       - conda: https://conda.anaconda.org/robostack-jazzy/linux-aarch64/ros-jazzy-image-transport-5.1.7-np2py312h61f2ce4_16.conda
+      - conda: https://conda.anaconda.org/robostack-jazzy/linux-aarch64/ros-jazzy-imu-filter-madgwick-2.1.5-np2py312h61f2ce4_16.conda
       - conda: https://conda.anaconda.org/robostack-jazzy/linux-aarch64/ros-jazzy-imu-sensor-broadcaster-4.37.0-np2py312h61f2ce4_16.conda
       - conda: https://conda.anaconda.org/robostack-jazzy/linux-aarch64/ros-jazzy-interactive-markers-2.5.5-np2py312h61f2ce4_16.conda
       - conda: https://conda.anaconda.org/robostack-jazzy/linux-aarch64/ros-jazzy-intra-process-demo-0.33.9-np2py312h6b1b059_16.conda
@@ -7197,6 +7198,31 @@ packages:
   license: BSD-3-Clause
   size: 584021
   timestamp: 1771210776432
+- conda: https://conda.anaconda.org/robostack-jazzy/linux-aarch64/ros-jazzy-imu-filter-madgwick-2.1.5-np2py312h61f2ce4_16.conda
+  sha256: 8d276e5938d5e4adf47f4abd6e40e89ed47618e13564f75b328547f711f0af0f
+  md5: 92acd63a5e0d3289fe57daa5e8d01e16
+  depends:
+  - python
+  - ros-jazzy-builtin-interfaces
+  - ros-jazzy-geometry-msgs
+  - ros-jazzy-nav-msgs
+  - ros-jazzy-rclcpp
+  - ros-jazzy-rclcpp-action
+  - ros-jazzy-rclcpp-lifecycle
+  - ros-jazzy-ros-workspace
+  - ros-jazzy-sensor-msgs
+  - ros-jazzy-tf2-geometry-msgs
+  - ros-jazzy-tf2-ros
+  - ros-jazzy-visualization-msgs
+  - ros2-distro-mutex 0.14.* jazzy_*
+  - libstdcxx >=14
+  - libgcc >=14
+  - ros2-distro-mutex >=0.14.0,<0.15.0a0
+  - numpy >=1.23,<3
+  - python_abi 3.12.* *_cp312
+  license: GPL-1.0-or-later
+  size: 338699
+  timestamp: 1771211312934
 - conda: https://conda.anaconda.org/robostack-jazzy/linux-aarch64/ros-jazzy-imu-sensor-broadcaster-4.37.0-np2py312h61f2ce4_16.conda
   sha256: 10135cd6f7edd175cf3446f2c7a8caaf25b9401a9b96ca4ae69f6a7b33dbf46c
   md5: 016369d42f6c9c3d7156851d18d9e63f
