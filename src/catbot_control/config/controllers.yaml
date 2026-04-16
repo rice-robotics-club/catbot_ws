@@ -1,8 +1,8 @@
 controller_manager:
   ros__parameters:
-    update_rate: 5 # Hz
+    update_rate: 50 # Hz
 
-    enforce_command_limits: true
+    # enforce_command_limits: true
 
     joint_state_broadcaster:
       type: joint_state_broadcaster/JointStateBroadcaster
@@ -38,7 +38,7 @@ onnxruntime_controller:
         "geometry_msgs/msg/Vector3",
         "geometry_msgs/msg/Vector3",
       ]
-    observation_scales: [1.0, 1.0, 1.0, 1.0, 0.05, 1.0]
+    observation_scales: [1.0, 1.0, 0.5, 1.0, 1.0, 1.0]
     observation_offsets: [0.0, 0.0, 0.0, 0.0, 0.0, 0.0]
     actions_interface: "position"
     joint_names: ["a", "l"]
