@@ -5,7 +5,7 @@
   <ros2_control name="IMU" type="sensor">
     <hardware>
       <plugin>icm20948_hardware/ICM20948Interface</plugin>
-      <param name="i2c_device">/dev/i2c-1</param>
+      <param name="i2c_device">/dev/i2c-7</param>
       <param name="i2c_address">105</param>
       <param name="reverse_accel">[true, false, false]</param>
       <param name="reverse_gyro">[false, true, true]</param>

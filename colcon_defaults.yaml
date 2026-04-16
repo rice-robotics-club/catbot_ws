@@ -3,3 +3,6 @@ build:
   mixin:
     - compile-commands
     - ccache
+  cmake-args:
+    - -DCMAKE_SHARED_LINKER_FLAGS="-L/home/jetson/catbot_ws/.pixi/envs/default/lib"
+    - -DCMAKE_EXE_LINKER_FLAGS="-L/home/jetson/catbot_ws/.pixi/envs/default/lib"

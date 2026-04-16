@@ -9,3 +9,6 @@ install/*
 build/*
 log/*
 .ccache/*
+# pixi environments
+.pixi/*
+!.pixi/config.toml

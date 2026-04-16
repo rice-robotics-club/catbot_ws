@@ -1,37 +1,45 @@
 controller_manager:
   ros__parameters:
-    update_rate: 10 # Hz
+    update_rate: 5 # Hz
+
+    enforce_command_limits: true
 
     joint_state_broadcaster:
       type: joint_state_broadcaster/JointStateBroadcaster
 
     imu_sensor_broadcaster:
-      type: imu_sensor_broadcaster/ImuSensorBroadcaster
+      type: imu_sensor_broadcaster/IMUSensorBroadcaster
 
     onnxruntime_controller:
       type: onnxruntime_controller/ONNXRuntimeController
+
+imu_sensor_broadcaster:
+  ros__parameters:
+    sensor_name: imu
+    frame_id: imu_link
 
 onnxruntime_controller:
   ros__parameters:
     observation_interfaces:
       [
-        "imu/angular_velocity",
-        "imu/linear_acceleration",
         "linear.y",
         "position",
         "velocity",
         "last_action",
+        "imu/angular_velocity",
+        "imu/linear_acceleration",
       ]
     observation_types:
       [
+        "float64",
+        "float64",
+        "float64",
+        "float64",
         "geometry_msgs/msg/Vector3",
         "geometry_msgs/msg/Vector3",
-        "float64",
-        "float64",
-        "float64",
-        "float64",
       ]
     observation_scales: [1.0, 1.0, 1.0, 1.0, 0.05, 1.0]
+    observation_offsets: [0.0, 0.0, 0.0, 0.0, 0.0, 0.0]
     actions_interface: "position"
     joint_names: ["a", "l"]
     action_scale: 0.25

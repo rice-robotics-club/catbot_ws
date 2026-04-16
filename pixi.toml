@@ -1,0 +1,24 @@
+[workspace]
+authors = ["Jetson <jetson@jetson>"]
+channels = ["robostack-jazzy", "conda-forge"]
+name = "catbot_ws"
+platforms = ["linux-aarch64"]
+version = "0.1.0"
+
+[tasks]
+
+[dependencies]
+ros-jazzy-desktop = ">=0.11.0,<0.12"
+pip = ">=26.0.1,<27"
+setuptools = "<70"
+colcon-common-extensions = ">=0.3.0,<0.4"
+lttng-ust = ">=2.13.9,<3"
+pkg-config = ">=0.29.2,<0.30"
+cmake = ">=4.3.1,<5"
+ros-jazzy-controller-manager = ">=4.43.0,<5"
+filelock = ">=3.25.2,<4"
+ros-jazzy-transmission-interface = ">=4.43.0,<5"
+ros-jazzy-hardware-interface = ">=4.43.0,<5"
+colcon-mixin = ">=0.2.3,<0.3"
+ros-jazzy-imu-sensor-broadcaster = ">=4.37.0,<5"
+ros-jazzy-joint-state-broadcaster = ">=4.37.0,<5"
