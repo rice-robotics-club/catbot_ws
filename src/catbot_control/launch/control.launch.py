@@ -20,7 +20,7 @@ def generate_launch_description():
                 [
                     FindPackageShare("catbot_control"),
                     "urdf",
-                    "catbot_leg.urdf.xacro",
+                    "catbot.urdf.xacro",
                 ]
             ),
         ]
@@ -94,6 +94,16 @@ def generate_launch_description():
         ],
     )
 
+    joint_trajectory_controller_spawner = Node(
+        package="controller_manager",
+        executable="spawner",
+        arguments=[
+            "joint_trajectory_controller",
+            "--controller-manager",
+            "/controller_manager",
+        ],
+    )
+
     delay_robot_controller_spawner_after_joint_state_broadcaster_spawner = (
         RegisterEventHandler(
             event_handler=OnProcessExit(
@@ -108,8 +118,9 @@ def generate_launch_description():
         control_node,
         robot_state_pub_node,
         joint_state_broadcaster_spawner,
-        imu_sensor_broadcaster_spawner,
-        delay_robot_controller_spawner_after_joint_state_broadcaster_spawner,
+        # imu_sensor_broadcaster_spawner,
+        # joint_trajectory_controller_spawner,
+        # delay_robot_controller_spawner_after_joint_state_broadcaster_spawner,
     ]
 
     return LaunchDescription(nodes)

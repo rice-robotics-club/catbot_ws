@@ -11,7 +11,7 @@ from launch_ros.substitutions import FindPackageShare
 def generate_launch_description():
     rviz_config = PathJoinSubstitution(
         [
-            FindPackageShare("catbot_leg_description"),
+            FindPackageShare("catbot_description"),
             "rviz",
             "preview.rviz",
         ]
