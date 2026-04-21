@@ -1,7 +1,7 @@
 import numpy as np
 import math
-from gait_utils import configure_vel_to_gait_func
-from leg_ik import calculate_leg_ik
+from catbot_ik.gait_utils import configure_vel_to_gait_func
+from catbot_ik.leg_ik import calculate_leg_ik
 
 def catbot_crawl(vel, cycle_period, turning=False, generated_leg_gait_func=configure_vel_to_gait_func(step_length=[-5, -1],step_width=[-1, 1],step_height=[-25, -12])):
     """
