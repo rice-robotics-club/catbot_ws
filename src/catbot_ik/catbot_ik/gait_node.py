@@ -44,10 +44,13 @@ class GaitNode(Node):
         self.turning = False
         self.phase = 0.0
 
+        # Compute IK neutral output (vel=0, phase=0) to use as reference delta
+        self._ik_neutral = self._compute_ik_neutral()
+
         # Calibration state
         self._calibrated = False
         self._calib_samples = []     # list of position dicts {joint_name: rad}
-        self._zero_offsets = {}      # {joint_name: rad} — latched after calibration
+        self._hw_startup = {}        # {joint_name: rad} — hardware positions at boot
 
         self.create_subscription(Twist, 'cmd_vel', self._cmd_vel_cb, 10)
         self.create_subscription(JointState, 'joint_states', self._joint_state_cb, 10)
@@ -68,6 +71,31 @@ class GaitNode(Node):
 
     # ── Calibration ──────────────────────────────────────────────────────────
 
+    def _compute_ik_neutral(self):
+        """IK output at vel=0, phase=0 — the reference point the calibration delta is measured from."""
+        neutral_angles = catbot_crawl(
+            vel=[0.0, 0.0],
+            cycle_period=0.0,
+            turning=False,
+            generated_leg_gait_func=self.gait_func,
+        )
+        result = {}
+        for i, angles in enumerate(neutral_angles):
+            hip_deg, t_a_deg, t_l_deg = angles
+            leg_joints = JOINT_NAMES[i * 3: i * 3 + 3]
+            if hip_deg is None:
+                for name in leg_joints:
+                    result[name] = 0.0
+                continue
+            if i in RIGHT_LEG_INDICES:
+                t_a_motor, t_l_motor = -t_a_deg, -t_l_deg
+            else:
+                t_a_motor, t_l_motor = t_a_deg, t_l_deg
+            result[leg_joints[0]] = math.radians(hip_deg)
+            result[leg_joints[1]] = math.radians(t_a_motor)
+            result[leg_joints[2]] = math.radians(t_l_motor)
+        return result
+
     def _joint_state_cb(self, msg: JointState):
         if self._calibrated:
             return
@@ -76,10 +104,9 @@ class GaitNode(Node):
 
     def _finish_calibration(self):
         if not self._calib_samples:
-            self.get_logger().warn('No joint states received during calibration — using zero offsets.')
-            self._zero_offsets = {name: 0.0 for name in JOINT_NAMES}
+            self.get_logger().warn('No joint states received during calibration — using hardware zeros.')
+            self._hw_startup = {name: 0.0 for name in JOINT_NAMES}
         else:
-            # Average each joint's position across all samples
             sums = {name: 0.0 for name in JOINT_NAMES}
             counts = {name: 0 for name in JOINT_NAMES}
             for sample in self._calib_samples:
@@ -87,14 +114,14 @@ class GaitNode(Node):
                     if name in sample:
                         sums[name] += sample[name]
                         counts[name] += 1
-            self._zero_offsets = {
+            self._hw_startup = {
                 name: (sums[name] / counts[name] if counts[name] > 0 else 0.0)
                 for name in JOINT_NAMES
             }
             self.get_logger().info(
-                'Calibration complete (%d samples). Zero offsets (deg): %s' % (
+                'Calibration complete (%d samples). Hardware startup (deg): %s' % (
                     len(self._calib_samples),
-                    {k: round(math.degrees(v), 1) for k, v in self._zero_offsets.items()},
+                    {k: round(math.degrees(v), 1) for k, v in self._hw_startup.items()},
                 )
             )
 
@@ -120,10 +147,10 @@ class GaitNode(Node):
         """
         Convert IK output (degrees) to motor-frame radians.
         Right legs mirror the a and l axes relative to left legs.
-        All values are then offset by the calibrated startup position so that
-        the IK rest position maps to wherever the robot was at boot.
+        The commanded position is: hw_startup + (ik_output - ik_neutral),
+        so the robot moves relative to its startup pose, not to the IK geometric zero.
         """
-        leg_joints = JOINT_NAMES[leg_idx * 3: leg_idx * 3 + 3]  # [hip, a, l]
+        leg_joints = JOINT_NAMES[leg_idx * 3: leg_idx * 3 + 3]
 
         if leg_idx in RIGHT_LEG_INDICES:
             t_a_motor = -t_a_deg
@@ -132,14 +159,16 @@ class GaitNode(Node):
             t_a_motor = t_a_deg
             t_l_motor = t_l_deg
 
-        positions_rad = [
+        ik_out = [
             math.radians(hip_deg),
             math.radians(t_a_motor),
             math.radians(t_l_motor),
         ]
 
-        # Shift by calibrated zero so startup pose = IK neutral
-        return [p + self._zero_offsets.get(name, 0.0) for p, name in zip(positions_rad, leg_joints)]
+        return [
+            self._hw_startup[name] + (ik - self._ik_neutral[name])
+            for ik, name in zip(ik_out, leg_joints)
+        ]
 
     def _tick(self):
         self.phase = (self.phase + 2 * math.pi * self.dt) % (2 * math.pi)
